@@ -26,7 +26,7 @@ namespace FastDownloaderAsync
     
     public class FastDownloaderAsync
     {
-        public async Task<DownloadResult> Download(string fileUrl, string destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
+        public async Task<DownloadResult> DownloadChunks(string fileUrl, string destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
         {
             ServicePointManager.Expect100Continue = false;
             ServicePointManager.DefaultConnectionLimit = 100;
