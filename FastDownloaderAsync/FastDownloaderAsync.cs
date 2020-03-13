@@ -23,7 +23,8 @@ namespace FastDownloaderAsync
         public long Start { get; set; }
         public long End { get; set; }
     }
-    public class FastDownloaderAsync
+    
+	public class FastDownloaderAsync
     {
         public async Task<DownloadResult> Download(String fileUrl, String destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
         {
