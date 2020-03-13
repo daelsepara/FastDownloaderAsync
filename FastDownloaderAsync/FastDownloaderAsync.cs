@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FastDownloaderAsync
 {
-    //SEE: https://dejanstojanovic.net/aspnet/2018/march/download-file-in-chunks-in-parallel-in-c/
+    // see: https://dejanstojanovic.net/aspnet/2018/march/download-file-in-chunks-in-parallel-in-c/
 
     public class DownloadResult
     {
@@ -35,11 +35,13 @@ namespace FastDownloaderAsync
                 tasks.Add(Download(fileUrl, destinationFilePath, numberOfChunks, validateSSL));
             });
 
+            // download all files asynchronously
             await Task.WhenAll(tasks);
         }
 
         private async Task<DownloadResult> Download(string fileUrl, string destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
         {
+            // download file by parts
             var downloadResult = await DownloadChunks(fileUrl, destinationFilePath, numberOfParallelDownloads, validateSSL);
 
             return downloadResult;
@@ -60,7 +62,7 @@ namespace FastDownloaderAsync
 
             var result = new DownloadResult() { FilePath = destinationFilePath };
 
-            // Handle number of parallel downloads  
+            // handle number of parallel downloads  
             if (numberOfChunks <= 0)
             {
                 numberOfChunks = Environment.ProcessorCount;
@@ -130,7 +132,7 @@ namespace FastDownloaderAsync
                     index++;
                 });
 
-                // Download all chunks asynchronously
+                // download all chunks asynchronously
                 await Task.WhenAll(tasks);
 
                 result.ParallelDownloads = index;
