@@ -26,7 +26,26 @@ namespace FastDownloaderAsync
     
     public class FastDownloaderAsync
     {
-        public async Task<DownloadResult> DownloadChunks(string fileUrl, string destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
+        public async Task DownloadFiles(List<string> fileUrls, string destinationFilePath, int numberOfParallelDownloads = 1, int numberOfChunks = 1, bool validateSSL = false)
+        {
+            var tasks = new ConcurrentBag<Task>();
+
+            Parallel.ForEach(fileUrls, new ParallelOptions() { MaxDegreeOfParallelism = numberOfParallelDownloads }, fileUrl =>
+            {
+                tasks.Add(Download(fileUrl, destinationFilePath, numberOfChunks, validateSSL));
+            });
+
+            await Task.WhenAll(tasks);
+        }
+
+        private async Task<DownloadResult> Download(string fileUrl, string destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
+        {
+            var downloadResult = await DownloadChunks(fileUrl, destinationFilePath, numberOfParallelDownloads, validateSSL);
+
+            return downloadResult;
+        }
+
+        public async Task<DownloadResult> DownloadChunks(string fileUrl, string destinationFilePath, int numberOfChunks = 1, bool validateSSL = false)
         {
             ServicePointManager.Expect100Continue = false;
             ServicePointManager.DefaultConnectionLimit = 100;
@@ -42,9 +61,9 @@ namespace FastDownloaderAsync
             var result = new DownloadResult() { FilePath = destinationFilePath };
 
             // Handle number of parallel downloads  
-            if (numberOfParallelDownloads <= 0)
+            if (numberOfChunks <= 0)
             {
-                numberOfParallelDownloads = Environment.ProcessorCount;
+                numberOfChunks = Environment.ProcessorCount;
             }
 
             #region Get file size  
@@ -77,12 +96,12 @@ namespace FastDownloaderAsync
 
                 var readRanges = new List<Range>();
 
-                for (var chunk = 0; chunk < numberOfParallelDownloads - 1; chunk++)
+                for (var chunk = 0; chunk < numberOfChunks - 1; chunk++)
                 {
                     var range = new Range()
                     {
-                        Start = chunk * (responseLength / numberOfParallelDownloads),
-                        End = ((chunk + 1) * (responseLength / numberOfParallelDownloads)) - 1
+                        Start = chunk * (responseLength / numberOfChunks),
+                        End = ((chunk + 1) * (responseLength / numberOfChunks)) - 1
                     };
                     
                     readRanges.Add(range);
@@ -104,7 +123,7 @@ namespace FastDownloaderAsync
 
                 var tasks = new ConcurrentBag<Task>();
 
-                Parallel.ForEach(readRanges, new ParallelOptions() { MaxDegreeOfParallelism = numberOfParallelDownloads }, readRange =>
+                Parallel.ForEach(readRanges, new ParallelOptions() { MaxDegreeOfParallelism = numberOfChunks }, readRange =>
                 {
                     tasks.Add(DownloadStream(fileUrl, readRange, tempFilesDictionary));
 
