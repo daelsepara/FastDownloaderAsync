@@ -13,7 +13,7 @@ namespace FastDownloaderAsync
     public class DownloadResult
     {
         public long Size { get; set; }
-        public String FilePath { get; set; }
+        public string FilePath { get; set; }
         public TimeSpan TimeTaken { get; set; }
         public int ParallelDownloads { get; set; }
     }
@@ -26,7 +26,7 @@ namespace FastDownloaderAsync
     
     public class FastDownloaderAsync
     {
-        public async Task<DownloadResult> Download(String fileUrl, String destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
+        public async Task<DownloadResult> Download(string fileUrl, string destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
         {
             ServicePointManager.Expect100Continue = false;
             ServicePointManager.DefaultConnectionLimit = 100;
@@ -71,7 +71,7 @@ namespace FastDownloaderAsync
 
             using (FileStream destinationStream = new FileStream(destinationFilePath, FileMode.Append))
             {
-                var tempFilesDictionary = new ConcurrentDictionary<long, String>();
+                var tempFilesDictionary = new ConcurrentDictionary<long, string>();
 
                 #region Calculate ranges
 
@@ -102,7 +102,7 @@ namespace FastDownloaderAsync
 
                 var index = 0;
 
-                var tasks = new List<Task>();
+                var tasks = new ConcurrentBag<Task>();
 
                 Parallel.ForEach(readRanges, new ParallelOptions() { MaxDegreeOfParallelism = numberOfParallelDownloads }, readRange =>
                 {
