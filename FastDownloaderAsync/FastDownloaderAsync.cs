@@ -32,14 +32,14 @@ namespace FastDownloaderAsync
 
             Parallel.ForEach(fileUrls, new ParallelOptions() { MaxDegreeOfParallelism = numberOfParallelDownloads }, fileUrl =>
             {
-                tasks.Add(Download(fileUrl, destinationFilePath, numberOfChunks, validateSSL));
+                tasks.Add(DownloadFileAsync(fileUrl, destinationFilePath, numberOfChunks, validateSSL));
             });
 
             // download all files asynchronously
             await Task.WhenAll(tasks);
         }
 
-        private async Task<DownloadResult> Download(string fileUrl, string destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
+        private async Task<DownloadResult> DownloadFileAsync(string fileUrl, string destinationFilePath, int numberOfParallelDownloads = 0, bool validateSSL = false)
         {
             // download file by parts
             var downloadResult = await DownloadChunks(fileUrl, destinationFilePath, numberOfParallelDownloads, validateSSL);
@@ -127,7 +127,7 @@ namespace FastDownloaderAsync
 
                 Parallel.ForEach(readRanges, new ParallelOptions() { MaxDegreeOfParallelism = numberOfChunks }, readRange =>
                 {
-                    tasks.Add(DownloadStream(fileUrl, readRange, tempFilesDictionary));
+                    tasks.Add(DownloadChunksAsync(fileUrl, readRange, tempFilesDictionary));
 
                     index++;
                 });
@@ -159,7 +159,7 @@ namespace FastDownloaderAsync
             }
         }
 
-        private async Task DownloadStream(string fileUrl, Range readRange, ConcurrentDictionary<long, string> tempFilesDictionary)
+        private async Task DownloadChunksAsync(string fileUrl, Range readRange, ConcurrentDictionary<long, string> tempFilesDictionary)
         {
             var httpWebRequest = HttpWebRequest.Create(fileUrl) as HttpWebRequest;
             
