@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -70,8 +70,8 @@ namespace FastDownloaderAsync
 
             #region Get file size  
             
-            var webRequest = HttpWebRequest.Create(fileUrl);
-            
+            var webRequest = WebRequest.Create(fileUrl);
+
             webRequest.Method = "HEAD";
             
             var responseLength = 0L;
@@ -161,7 +161,7 @@ namespace FastDownloaderAsync
 
         private async Task DownloadChunksAsync(string fileUrl, Range readRange, ConcurrentDictionary<long, string> tempFilesDictionary)
         {
-            var httpWebRequest = HttpWebRequest.Create(fileUrl) as HttpWebRequest;
+            var httpWebRequest = WebRequest.Create(fileUrl) as HttpWebRequest;
             
             httpWebRequest.Method = "GET";
             httpWebRequest.AddRange(readRange.Start, readRange.End);
