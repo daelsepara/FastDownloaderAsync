@@ -91,7 +91,7 @@ namespace FastDownloaderAsync
             }
 
             var filename = WebUtility.UrlDecode(Path.GetFileName(fileUrl));
-            var fullPath = string.Concat(destinationFilePath, "\\", filename);
+            var fullPath = Path.Combine(destinationFilePath, filename);
 
             using (FileStream destinationStream = new FileStream(fullPath, FileMode.Append))
             {
