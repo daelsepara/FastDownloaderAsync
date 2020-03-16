@@ -90,7 +90,10 @@ namespace FastDownloaderAsync
                 File.Delete(destinationFilePath);
             }
 
-            using (FileStream destinationStream = new FileStream(destinationFilePath, FileMode.Append))
+            var filename = WebUtility.UrlDecode(Path.GetFileName(fileUrl));
+            var fullPath = string.Concat(destinationFilePath, "\\", filename);
+
+            using (FileStream destinationStream = new FileStream(fullPath, FileMode.Append))
             {
                 var tempFilesDictionary = new ConcurrentDictionary<long, string>();
 
